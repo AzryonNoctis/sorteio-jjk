@@ -12,6 +12,9 @@ ELEMENTOS = {
     "⚡": "Raio",
     "🌪️": "Vento",
     "🌑": "Sombra",
+    "🌀": "Ciclone",
+    "💨": "Fumaça",
+    "💎": "Diamante",
 }
 
 # Esquadrões / casas / marcas
