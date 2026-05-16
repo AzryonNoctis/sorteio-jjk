@@ -289,14 +289,11 @@ def formatar_resultado(lutas, sobra=None):
     for i, (p1, p2) in enumerate(lutas, 1):
         num = numero_estilizado(i)
 
-        reino1 = p1["reinos"][0] if p1["reinos"] else "?"
-        reino2 = p2["reinos"][0] if p2["reinos"] else "?"
-
         blocos.append(
             f"🥋 Luta ꪶ-{num}-ꫂ\n"
-            f"[{reino1}] {p1['nome']}\n"
+            f"{p1['nome']}\n"
             f"🆚\n"
-            f"[{reino2}] {p2['nome']}"
+            f"{p2['nome']}"
         )
 
     if sobra:
