@@ -107,11 +107,9 @@ def extrair_nome_linha(linha):
     if not linha:
         return None
 
-    linha = re.sub(
-        r"^\s*(?:\d+|[0-9️⃣⃣]+)\s*:\s*",
-        "",
-        linha
-    ).strip()
+    # Correção do re.sub para evitar quebra com os blocos de bytes dos emojis numéricos
+    linha = re.sub(r"^\s*\d+\s*:\s*", "", linha).strip()
+    linha = re.sub(r"^\s*(?:\d\ufe0f?\u20e3)+\s*:\s*", "", linha).strip()
 
     linha = linha.strip("*").strip()
 
