@@ -107,7 +107,7 @@ def extrair_nome_linha(linha):
     if not linha:
         return None
 
-    # Correção do re.sub para evitar quebra com os blocos de bytes dos emojis numéricos
+    # Remove qualquer numeração inicial de forma totalmente segura
     linha = re.sub(r"^\s*\d+\s*:\s*", "", linha).strip()
     linha = re.sub(r"^\s*(?:\d\ufe0f?\u20e3)+\s*:\s*", "", linha).strip()
 
@@ -225,10 +225,10 @@ def score_par(p1, p2):
     return score
 
 # =========================
-# EMPARELHAMENTO
+# EMPARELHAMENTO (OTIMIZADO)
 # =========================
 
-def gerar_emparelhamento(jogadores, tentativas=4000):
+def gerar_emparelhamento(jogadores, tentativas=250):
     if len(jogadores) < 2:
         return [], None
 
@@ -242,11 +242,12 @@ def gerar_emparelhamento(jogadores, tentativas=4000):
 
         lutas = []
         score_total = 0
+        erro_loop = False
 
         while len(pool) >= 2:
             p1 = pool.pop(0)
 
-            melhor_idx = None
+            melhor_idx = 0
             melhor_score = -10**9
 
             for i, p2 in enumerate(pool):
@@ -256,10 +257,17 @@ def gerar_emparelhamento(jogadores, tentativas=4000):
                     melhor_score = s
                     melhor_idx = i
 
-            p2 = pool.pop(melhor_idx)
+            # Garante que não vai estourar caso o índice mude de forma inesperada
+            if melhor_idx < len(pool):
+                p2 = pool.pop(melhor_idx)
+                lutas.append((p1, p2))
+                score_total += melhor_score
+            else:
+                erro_loop = True
+                break
 
-            lutas.append((p1, p2))
-            score_total += melhor_score
+        if erro_loop:
+            continue
 
         sobra = pool[0] if pool else None
 
@@ -267,6 +275,15 @@ def gerar_emparelhamento(jogadores, tentativas=4000):
             melhor_score_total = score_total
             melhor_lutas = lutas
             melhor_sobra = sobra
+
+    # Fallback de segurança absoluta caso nenhuma tentativa tenha pontuado corretamente
+    if melhor_lutas is None:
+        pool = jogadores[:]
+        random.shuffle(pool)
+        melhor_lutas = []
+        while len(pool) >= 2:
+            melhor_lutas.append((pool.pop(0), pool.pop(0)))
+        melhor_sobra = pool[0] if pool else None
 
     return melhor_lutas, melhor_sobra
 
